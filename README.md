@@ -1,8 +1,7 @@
 # LPR-Stability-Gap
 
-> **Note:** This project is heavily inspired by Gido van de Ven’s code available at [https://github.com/GMvandeVen/continual-learning/tree/master/StabilityGap](https://github.com/GMvandeVen/continual-learning/tree/master/StabilityGap).
+> **Note:** This project is heavily inspired by Gido van de Ven’s code available at [https://github.com/GMvandeVen/continual-learning/tree/master/StabilityGap](https://github.com/GMvandeVen/continual-learning/tree/master/StabilityGap).  
 > It implements **Layerwise Proximal Replay (LPR)** as proposed by the PLAI group ([https://github.com/plai-group/LPR](https://github.com/plai-group/LPR)).
-
 
 This repository provides an implementation of **LPR** for continual learning, applied to the Rotated MNIST benchmark. The approach evaluates the stability of learning under task switches by combining replay-based training with layerwise activation-based preconditioning.
 
@@ -20,15 +19,9 @@ This repository provides an implementation of **LPR** for continual learning, ap
 
 Simply run the script with Python 3. Training results are saved incrementally using `pickle`, and can be recovered if interrupted.
 
-# requirements.txt
-# 
-# This file lists all Python dependencies required to run the project.
-# Install using:
-#     pip install -r requirements.txt
-#
-# Included packages:
-# - matplotlib: for plotting and saving figures (e.g., with PdfPages)
-# - numpy: for numerical operations
-# - torch: PyTorch library for deep learning
-# - torchvision: common datasets and image transformation utilities
-# - tqdm: for progress bars during training or data processing
+## Requirements
+
+To install the dependencies, run:
+
+```bash
+pip install -r requirements.txt
