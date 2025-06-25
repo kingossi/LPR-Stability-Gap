@@ -77,8 +77,10 @@ def evaluate(model, dataset, batch_size=1000):
             total += y.size(0)
     return 100.0 * correct / total
 
+iters_per_task = [500, 750, 1000, 1250]
 
-def train_and_evaluate_multi(model, trainset, testsets, iters=500, lr=0.1, batch_size=256,
+
+def train_and_evaluate_multi(model, trainset, testsets, iters, lr=0.1, batch_size=256,
                              test_size=1000, eval_interval=1):
     model.train()
     optimizer = torch.optim.SGD(model.parameters(), lr=lr)
@@ -117,53 +119,39 @@ def train_and_evaluate_multi(model, trainset, testsets, iters=500, lr=0.1, batch
     return performance_by_task
 
 
-def save_partial_results(filename, data):
-    with open(filename, 'wb') as f:
-        pickle.dump(data, f)
-
-def load_partial_results(filename):
-    if os.path.exists(filename):
-        with open(filename, 'rb') as f:
-            return pickle.load(f)
-    return {}
-
-
 results_dir = "./results"
 os.makedirs(results_dir, exist_ok=True)
 
 lrs_to_try = [0.01, 0.1, 0.5, 1.0]
 repeats = 5
-iters = 500
 batch_size = 256
 
-
-combined_results = {}  
+combined_results = {}
 
 for lr in lrs_to_try:
     combined_results[lr] = []
     for run in range(repeats):
         print(f"\nRunning LR={lr}, Repeat={run+1}")
-
         model = MLP().to(device)
         performance_all_tasks = [[] for _ in rotations]
 
-        for task_id in range(len(train_datasets)):
+        for task_id, num_iters in enumerate(iters_per_task):
             joint_data = torch.utils.data.ConcatDataset(train_datasets[:task_id+1])
             testsets = test_datasets[:task_id+1]
 
-            print(f"\nTraining on Tasks 1 to {task_id+1} with LR={lr}")
+            print(f"\nTraining on Tasks 1 to {task_id+1} with LR={lr}, Iters={num_iters}")
             batch_size_to_use = (task_id + 1) * batch_size
 
             task_performances = train_and_evaluate_multi(
                 model, joint_data, testsets,
-                iters=iters, lr=lr, batch_size=batch_size_to_use
+                iters=num_iters, lr=lr, batch_size=batch_size_to_use
             )
 
             for i in range(len(rotations)):
                 if i <= task_id:
                     performance_all_tasks[i].extend(task_performances[i])
                 else:
-                    performance_all_tasks[i].extend([None] * iters)
+                    performance_all_tasks[i].extend([None] * num_iters)
 
         combined_results[lr].append(performance_all_tasks)
 
@@ -173,4 +161,3 @@ with open(final_output_path, 'wb') as f:
     pickle.dump(combined_results, f)
 
 print(f"\nSaved all baseline results to: {final_output_path}")
-
